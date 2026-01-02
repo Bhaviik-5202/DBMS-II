@@ -32,10 +32,10 @@ AS
 BEGIN 
 	DECLARE @DIFF INT;
 	SET @DIFF = DATEDIFF(DAY, @DATE1, @DATE2);
-	RETURN ABS(@DIFF);
+	RETURN ABS(@DIFF); -- Neg -> Pos Convert 
 END;
 
-SELECT dbo.FN_GIVEN_BET_DATES('2024-12-31', '2025-12-31') AS DaysDifference;
+SELECT dbo.FN_GIVEN_BET_DATES('2025-12-31', '2026-12-31') AS DaysDifference; -- (365)
 
 --4. Write a scalar function which returns the sum of Credits for two given CourseIDs.
 CREATE OR ALTER FUNCTION FN_SUM_CREDITS
@@ -43,12 +43,13 @@ CREATE OR ALTER FUNCTION FN_SUM_CREDITS
 RETURNS INT
 AS
 BEGIN
-	DECLARE @SUM INT = 0;
-	SELECT @SUM = ISNULL(SUM(CourseCredits), 0)
-	FROM COURSE
-	WHERE CourseID IN (@CID1, @CID2);
+    DECLARE @SUM INT = 0;
 
-	RETURN @SUM;
+    SELECT @SUM = SUM(CourseCredits)
+    FROM COURSE
+    WHERE CourseID IN (@CID1, @CID2);
+
+    RETURN @SUM;
 END;
 
 SELECT dbo.FN_SUM_CREDITS('CS101', 'CS201') AS TotalCredits;
@@ -89,6 +90,27 @@ BEGIN
 END;
 
 SELECT dbo.FN_1_TO_N(10) AS Numbers;
+
+--6. Write a function to print number from 1 to N. (Using while loop)
+CREATE OR ALTER FUNCTION FN_1_TO_Num
+(@NUM INT)
+RETURNS VARCHAR(1000)
+AS
+BEGIN
+	DECLARE @MSG VARCHAR(1000);
+	DECLARE @COUNT INT;
+	SET @MSG = '';
+	SET @COUNT = 1;
+	WHILE  ( @COUNT <= @NUM )
+	BEGIN 
+		SET @MSG = @MSG + CAST(@COUNT AS VARCHAR) + ' '
+		SET @COUNT = @COUNT + 1;
+	END;
+	    
+	RETURN @MSG;
+END;
+
+SELECT dbo.FN_1_TO_Num(10) AS Numbers;
 
 --7. Write a scalar function to calculate factorial of total credits for a given CourseID.
 CREATE OR ALTER FUNCTION FN_FAC_OF_CREDITS
@@ -217,7 +239,7 @@ AS
 BEGIN
     DECLARE @LEN INT;
     DECLARE @I INT = 1;
-    DECLARE @IS_PALINDROME BIT = 1;  -- 1 = TRUE, 0 = FALSE
+    DECLARE @IS_PALINDROME BIT = 1;  --      (1 = TRUE, 0 = FALSE)
     
     -- Remove spaces and convert to uppercase for string comparison
     SET @INPUT = UPPER(REPLACE(@INPUT, ' ', ''));
@@ -312,12 +334,13 @@ CREATE OR ALTER FUNCTION FN_SUM_CSE_CREDITS()
 RETURNS INT
 AS
 BEGIN
-	DECLARE @TOTAL INT;
-	SELECT @TOTAL = SUM(CourseCredits)
-	FROM COURSE
-	WHERE CourseDepartment = 'CSE';
-	
-	RETURN ISNULL(@TOTAL, 0);
+    DECLARE @TOTAL INT;
+
+    SELECT @TOTAL = SUM(CourseCredits)
+    FROM COURSE
+    WHERE CourseDepartment = 'CSE';
+    
+    RETURN @TOTAL;
 END;
 
 SELECT dbo.FN_SUM_CSE_CREDITS() AS TotalCSECredits;
@@ -336,8 +359,10 @@ RETURN (
 		F.FacultyName,
 		F.FacultyDesignation
 	FROM COURSE C
-	JOIN COURSE_ASSIGNMENT CA ON C.CourseID = CA.CourseID
-	JOIN FACULTY F ON CA.FacultyID = F.FacultyID
+	JOIN COURSE_ASSIGNMENT CA 
+	ON C.CourseID = CA.CourseID
+	JOIN FACULTY F 
+	ON CA.FacultyID = F.FacultyID
 	WHERE F.FacultyDesignation = @DESIGNATION
 );
 
@@ -352,15 +377,16 @@ CREATE OR ALTER FUNCTION FN_TOTAL_ENROLLED_CREDITS
 RETURNS INT
 AS
 BEGIN
-	DECLARE @TOTAL_CREDITS INT;
-	
-	SELECT @TOTAL_CREDITS = ISNULL(SUM(C.CourseCredits), 0)
-	FROM ENROLLMENT E
-	JOIN COURSE C ON E.CourseID = C.CourseID
-	WHERE E.StudentID = @STUDENTID 
-	  AND E.EnrollmentStatus = 'Active';
-	
-	RETURN @TOTAL_CREDITS;
+    DECLARE @TOTAL_CREDITS INT;
+    
+    SELECT @TOTAL_CREDITS = SUM(C.CourseCredits)
+    FROM ENROLLMENT E
+    JOIN COURSE C 
+    ON E.CourseID = C.CourseID
+    WHERE E.StudentID = @STUDENTID 
+      AND E.EnrollmentStatus = 'Active';
+    
+    RETURN @TOTAL_CREDITS;
 END;
 
 SELECT dbo.FN_TOTAL_ENROLLED_CREDITS(1) AS TotalEnrolledCredits;
@@ -373,13 +399,13 @@ CREATE OR ALTER FUNCTION FN_FACULTY_COUNT_BY_JOIN_RANGE
 RETURNS INT
 AS
 BEGIN
-	DECLARE @COUNT INT;
-	
-	SELECT @COUNT = COUNT(*)
-	FROM FACULTY
-	WHERE FacultyJoiningDate BETWEEN @START_DATE AND @END_DATE;
-	
-	RETURN ISNULL(@COUNT, 0);
+    DECLARE @COUNT INT;
+    
+    SELECT @COUNT = COUNT(*)
+    FROM FACULTY
+    WHERE FacultyJoiningDate BETWEEN @START_DATE AND @END_DATE;
+    
+    RETURN @COUNT;
 END;
 
 SELECT dbo.FN_FACULTY_COUNT_BY_JOIN_RANGE('2010-01-01', '2020-12-31') AS FacultyCount;
