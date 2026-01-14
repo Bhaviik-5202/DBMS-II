@@ -1,0 +1,123 @@
+Lab-9: createCollection, dropCollection and insert method
+
+
+
+PART - A ===================>
+
+// 1. Create a new database named "Darshan"
+use Darshan
+
+// 2. Create another new database named "DIET"
+use DIET
+
+// 3. List all databases
+show dbs
+
+// 4. Check the current database
+db
+
+// 5. Drop "DIET" database
+use DIET
+db.dropDatabase()
+
+// 6. Create collection "Student" in "Darshan"
+use Darshan
+db.createCollection("Student")
+
+// 7. Create collection "Department"
+db.createCollection("Department")
+
+// 8. List all collections in Darshan
+show collections
+
+// 9. Insert single doc into Department
+db.Department.insertOne({ Dname: 'CE', HOD: 'Patel' })
+
+// 10. Insert two docs into Department
+db.Department.insertMany([
+  { Dname: 'IT' },
+  { Dname: 'ICT' }
+])
+
+// 11. Drop Department collection
+db.Department.drop()
+
+// 12. Insert into Student (your data)
+db.Student.insertOne({
+  Name: "YourName",
+  City: "YourCity",
+  Branch: "YourBranch",
+  Semester: 5,
+  Age: 20
+})
+
+// 13. Insert three friends' data
+db.Student.insertMany([
+  { Name: "Friend1", City: "City1", Branch: "CE", Semester: 4, Age: 19 },
+  { Name: "Friend2", City: "City2", Branch: "IT", Semester: 6, Age: 21 },
+  { Name: "Friend3", City: "City3", Branch: "ICT", Semester: 3, Age: 18 }
+])
+
+// 14. Check if Student collection exists
+db.getCollectionNames().includes("Student")
+
+// 15. Check stats of Student
+db.Student.stats()
+
+// 16. Drop Student collection
+db.Student.drop()
+
+// 17. Create Deposit collection
+db.createCollection("Deposit")
+
+// 18. Insert into Deposit
+db.Deposit.insertMany([
+  { ACTNO: 101, CNAME: "ANIL", BNAME: "VRCE", AMOUNT: 1000.00, CITY: "RAJKOT" },
+  { ACTNO: 102, CNAME: "SUNIL", BNAME: "AJNI", AMOUNT: 5000.00, CITY: "SURAT" },
+  { ACTNO: 103, CNAME: "MEHUL", BNAME: "KAROLBAGH", AMOUNT: 3500.00, CITY: "BARODA" },
+  { ACTNO: 104, CNAME: "MADHURI", BNAME: "CHANDI", AMOUNT: 1200.00, CITY: "AHMEDABAD" },
+  { ACTNO: 105, CNAME: "PRMOD", BNAME: "M.G. ROAD", AMOUNT: 3000.00, CITY: "SURAT" },
+  { ACTNO: 106, CNAME: "SANDIP", BNAME: "ANDHERI", AMOUNT: 2000.00, CITY: "RAJKOT" },
+  { ACTNO: 107, CNAME: "SHIVANI", BNAME: "VIRAR", AMOUNT: 1000.00, CITY: "SURAT" },
+  { ACTNO: 108, CNAME: "KRANTI", BNAME: "NEHRU PLACE", AMOUNT: 5000.00, CITY: "RAJKOT" }
+])
+
+// 19. Display all documents
+db.Deposit.find()
+
+// 20. Drop Deposit
+db.Deposit.drop()
+
+
+PART - B ===================>
+// 1. Create database Computer
+use Computer
+
+// 2. Create Faculty collection
+db.createCollection("Faculty")
+
+// 3. Insert one document
+db.Faculty.insertOne({ FID: 1, FNAME: "ANIL", BNAME: "CE", SALARY: 10000, JDATE: "1-3-95" })
+
+// 4. Insert many documents
+db.Faculty.insertMany([
+  { FID: 2, FNAME: "SUNIL", BNAME: "CE", SALARY: 50000, JDATE: "4-1-96" },
+  { FID: 3, FNAME: "MEHULI", BNAME: "IT", SALARY: 35000, JDATE: "17-11-95" },
+  { FID: 4, FNAME: "MADHURI", BNAME: "IT", SALARY: 12000, JDATE: "17-12-95" },
+  { FID: 5, FNAME: "PRMOD", BNAME: "CE", SALARY: 30000, JDATE: "27-3-96" },
+  { FID: 6, FNAME: "SANDIP", BNAME: "CE", SALARY: 20000, JDATE: "31-3-96" },
+  { FID: 7, FNAME: "SHIVANI", BNAME: "CE", SALARY: 10000, JDATE: "5-9-95" },
+  { FID: 8, FNAME: "KRANTI", BNAME: "IT", SALARY: 50000, JDATE: "2-7-95" }
+])
+
+// 5. Display all documents
+db.Faculty.find()
+
+// 6. Drop Faculty collection
+db.Faculty.drop()
+
+// 7. Drop Computer database
+db.dropDatabase()
+
+
+PART - C ===================>
