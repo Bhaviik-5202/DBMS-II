@@ -1,0 +1,259 @@
+Lab-11: update, delete and rename method
+
+
+PART - A ===================>
+
+// 1. Update John's age to 31
+db.Student.updateOne({ name: "John" }, { $set: { age: 31 } })
+
+// 2. Update city from New York to New Jersey
+db.Student.updateMany({ city: "New York" }, { $set: { city: "New Jersey" } })
+
+// 3. Set isActive false for age > 35
+db.Student.updateMany({ age: { $gt: 35 } }, { $set: { isActive: false } })
+
+// 4. Increment all ages by 1
+db.Student.updateMany({}, { $inc: { age: 1 } })
+
+// 5. Set Eva's city to Cambridge
+db.Student.updateOne({ name: "Eva" }, { $set: { city: "Cambridge" } })
+
+// 6. Update Sophia's isActive to false
+db.Student.updateOne({ name: "Sophia" }, { $set: { isActive: false } })
+
+// 7. City = San Diego for age < 30
+db.Student.updateMany({ age: { $lt: 30 } }, { $set: { city: "San Diego" } })
+
+// 8. Rename age field to years
+db.Student.updateMany({}, { $rename: { "age": "years" } })
+
+// 9. Set Nick active
+db.Student.updateOne({ name: "Nick" }, { $set: { isActive: true } })
+
+// 10. Add country field with value USA
+db.Student.updateMany({}, { $set: { country: "USA" } })
+
+// 11. Update David's city to Orlando
+db.Student.updateOne({ name: "David" }, { $set: { city: "Orlando" } })
+
+// 12. Multiply years by 2
+db.Student.updateMany({}, { $mul: { years: 2 } })
+
+// 13. Remove city field for Tom
+db.Student.updateOne({ name: "Tom" }, { $unset: { city: "" } })
+
+// 14. Add premiumUser true if years > 30
+db.Student.updateMany({ years: { $gt: 30 } }, { $set: { premiumUser: true } })
+
+// 15. Set Jane active
+db.Student.updateOne({ name: "Jane" }, { $set: { isActive: true } })
+
+// 16. Set Lucy inactive
+db.Student.updateOne({ name: "Lucy" }, { $set: { isActive: false } })
+
+// 17. Delete Nick
+db.Student.deleteOne({ name: "Nick" })
+
+// 18. Delete all inactive students
+db.Student.deleteMany({ isActive: false })
+
+// 19. Delete all from New York
+db.Student.deleteMany({ city: "New York" })
+
+// 20. Delete age > 35
+db.Student.deleteMany({ years: { $gt: 35 } })
+
+// 21. Delete Olivia
+db.Student.deleteOne({ name: "Olivia" })
+
+// 22. Delete age < 25
+db.Student.deleteMany({ years: { $lt: 25 } })
+
+// 23. Delete first active student
+db.Student.deleteOne({ isActive: true })
+
+// 24. Delete all from Los Angeles
+db.Student.deleteMany({ city: "Los Angeles" })
+
+// 25. Delete students missing city field
+db.Student.deleteMany({ city: { $exists: false } })
+
+// 26. Rename city to location
+db.Student.updateMany({}, { $rename: { "city": "location" } })
+
+// 27. Rename name to FullName for John
+db.Student.updateOne({ name: "John" }, { $rename: { "name": "FullName" } })
+
+// 28. Rename isActive to status
+db.Student.updateMany({}, { $rename: { "isActive": "status" } })
+
+// 29. Rename age to yearsOld for San Francisco students
+db.Student.updateMany({ location: "San Francisco" }, { $rename: { "years": "yearsOld" } })
+
+// 30. Create capped collection Employee (max 3 docs)
+db.createCollection("Employee", { capped: true, size: 10000, max: 3 })
+
+// Insert documents
+db.Employee.insertMany([
+  { Ecode: 1, Ename: "John" },
+  { Ecode: 2, Ename: "Jane", age: 25, city: "Los Angeles" },
+  { Ecode: 3, Ename: "Tom", age: 35 },
+  { Ecode: 4, Ename: "Lucy", age: 28, city: "San Francisco", isActive: true }
+])
+
+// Check count
+db.Employee.find().count()
+
+
+
+PART - B ===================>
+
+// 1. Female students in Rajkot
+db.Student.find({ Gender: "Female", City: "Rajkot" })
+
+// 2. Students not in 3rd sem
+db.Student.find({ Sem: { $ne: 3 } })
+
+// 3. City = Jamnagar or Baroda (using $in)
+db.Student.find({ City: { $in: ["Jamnagar", "Baroda"] } })
+
+// 4. First 2 students in Baroda
+db.Student.find({ City: "Baroda" }).limit(2).projection({ Name: 1, _id: 0 })
+
+// 5. Male students in 3rd sem
+db.Student.find({ Gender: "Male", Sem: 3 })
+
+// 6. Name, City, Fees where Rollno < 105
+db.Student.find(
+  { Rollno: { $lt: 105 } },
+  { Name: 1, City: 1, Fees: 1, _id: 0 }
+)
+
+// 7. Update City Jamnagar & Department CE to Surat
+db.Student.updateMany(
+  { City: "Jamnagar", Department: "CE" },
+  { $set: { City: "Surat" } }
+)
+
+// 8. Increase Fees by 500 where Gender != Female
+db.Student.updateMany(
+  { Gender: { $ne: "Female" } },
+  { $inc: { Fees: 500 } }
+)
+
+// 9. Set Department to Electrical for EE and Sem 3
+db.Student.updateMany(
+  { Department: "EE", Sem: 3 },
+  { $set: { Department: "Electrical" } }
+)
+
+// 10. Update Fees to 15000 for Rajkot male students
+db.Student.updateMany(
+  { City: "Rajkot", Gender: "Male" },
+  { $set: { Fees: 15000 } }
+)
+
+// 11. Change City to Vadodara for Sem 5 and Fees < 10000
+db.Student.updateMany(
+  { Sem: 5, Fees: { $lt: 10000 } },
+  { $set: { City: "Vadodara" } }
+)
+
+// 12. Delete where City = Ahmedabad or Gender = Male
+db.Student.deleteMany({
+  $or: [
+    { City: "Ahmedabad" },
+    { Gender: "Male" }
+  ]
+})
+
+// 13. Delete where Rollno not in [101, 105, 110]
+db.Student.deleteMany({ Rollno: { $nin: [101, 105, 110] } })
+
+// 14. Delete Civil department students in Sem 5 or 7
+db.Student.deleteMany({
+  Department: "Civil",
+  Sem: { $in: [5, 7] }
+})
+
+// 15. Delete students not from Rajkot, Baroda, Jamnagar
+db.Student.deleteMany({ City: { $nin: ["Rajkot", "Baroda", "Jamnagar"] } })
+
+// 16. Delete Rollno between 105 and 108
+db.Student.deleteMany({ Rollno: { $gte: 105, $lte: 108 } })
+
+// 17. Rename City to LOCATION
+db.Student.updateMany({}, { $rename: { "City": "LOCATION" } })
+
+// 18. Rename Department to Branch where Fees < 10000
+db.Student.updateMany(
+  { Fees: { $lt: 10000 } },
+  { $rename: { "Department": "Branch" } }
+)
+
+// 19. Rename Sname to Fullname for Rollno in [106,107,108]
+db.Student.updateMany(
+  { Rollno: { $in: [106, 107, 108] } },
+  { $rename: { "Sname": "Fullname" } }
+)
+
+// 20. Rename Fees to Tuition_Fees where Fees > 9000
+db.Student.updateMany(
+  { Fees: { $gt: 9000 } },
+  { $rename: { "Fees": "Tuition_Fees" } }
+)
+
+// 21. Rename Department to Major where Fees < 15000 and Gender = Female
+db.Student.updateMany(
+  { Fees: { $lt: 15000 }, Gender: "Female" },
+  { $rename: { "Department": "Major" } }
+)
+
+// 22. Rename City to Hometown where Sem = 3 and Department != Mechanical
+db.Student.updateMany(
+  { Sem: 3, Department: { $ne: "Mechanical" } },
+  { $rename: { "City": "Hometown" } }
+)
+
+
+
+PART - C ===================>
+
+
+// 1. Create capped collection logs (max 100KB, 10 docs)
+db.createCollection("logs", {
+  capped: true,
+  size: 102400, // 100KB
+  max: 10
+})
+
+// 2. Insert 12 log entries
+db.logs.insertMany([
+  { message: "System started", level: "info", timestamp: new Date() },
+  { message: "Disk space low", level: "warning", timestamp: new Date() },
+  { message: "User login", level: "info", timestamp: new Date() },
+  { message: "System reboot", level: "info", timestamp: new Date() },
+  { message: "Error in module", level: "error", timestamp: new Date() },
+  { message: "Memory usage high", level: "warning", timestamp: new Date() },
+  { message: "User logout", level: "info", timestamp: new Date() },
+  { message: "File uploaded", level: "info", timestamp: new Date() },
+  { message: "Network error", level: "error", timestamp: new Date() },
+  { message: "Backup completed", level: "info", timestamp: new Date() },
+  { message: "Database error", level: "error", timestamp: new Date() },
+  { message: "Service started", level: "info", timestamp: new Date() }
+])
+
+// 3. Check only last 10 docs are retained
+db.logs.find().count() // Should be 10
+
+// 4. Insert 5 more docs
+db.logs.insertMany([
+  { message: "New log entry 1", level: "info", timestamp: new Date() },
+  { message: "New log entry 2", level: "info", timestamp: new Date() },
+  { message: "New log entry 3", level: "info", timestamp: new Date() },
+  { message: "New log entry 4", level: "warning", timestamp: new Date() },
+  { message: "New log entry 5", level: "error", timestamp: new Date() }
+])
+
+// Check oldest ones removed automatically
+db.logs.find().sort({ timestamp: 1 }).limit(5)
