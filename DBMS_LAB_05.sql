@@ -406,9 +406,9 @@ BEGIN
         
     DECLARE Grade_Update_Cursor CURSOR
     FOR 
-        SELECT EnrollmentID, Grade, Status
+        SELECT EnrollmentID, Grade, EnrollmentStatus
         FROM ENROLLMENT 
-        WHERE Status = 'Completed'
+        WHERE EnrollmentStatus = 'Completed'
         ORDER BY EnrollmentID;
         
     OPEN Grade_Update_Cursor;
@@ -437,7 +437,7 @@ BEGIN
 
     -- Verify the updates
     PRINT 'Total ' + CAST(@UpdateCount AS VARCHAR) + ' records updated.';
-    SELECT * FROM ENROLLMENT WHERE Status = 'Completed' AND Grade = 'F' ORDER BY EnrollmentID;
+    SELECT * FROM ENROLLMENT WHERE EnrollmentStatus = 'Completed' AND Grade = 'F' ORDER BY EnrollmentID;
 END
 ELSE
 BEGIN
@@ -460,7 +460,10 @@ BEGIN
     FOR
         SELECT F.FacultyName, C.CourseName
         FROM FACULTY F
-        JOIN COURSE C ON F.FacultyID = C.FacultyID
+        JOIN COURSE_ASSIGNMENT CA 
+        ON F.FacultyID = CA.FacultyID
+        JOIN COURSE C
+        ON C.CourseID = CA.CourseID
         ORDER BY F.FacultyName, C.CourseName;
         
     OPEN Faculty_Course_Cursor;
@@ -505,8 +508,10 @@ BEGIN
     FOR
         SELECT S.StuName, SUM(C.CourseCredits) as TotalCredits
         FROM STUDENT S
-        JOIN ENROLLMENT E ON S.StudentID = E.StudentID
-        JOIN COURSE C ON E.CourseID = C.CourseID
+        JOIN ENROLLMENT E 
+        ON S.StudentID = E.StudentID
+        JOIN COURSE C 
+        ON E.CourseID = C.CourseID
         GROUP BY S.StuName
         ORDER BY TotalCredits DESC, S.StuName;
         
