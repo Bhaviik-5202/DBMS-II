@@ -73,7 +73,6 @@ END;
 
 --6. Create trigger for calculating faculty experience (Note: Add required column in faculty table)
 -- First add experience column to Faculty table
--- First add experience column to Faculty table
 ALTER TABLE FACULTY ADD Experience INT NULL;
 
 GO
@@ -85,7 +84,8 @@ BEGIN
     UPDATE f
     SET f.Experience = DATEDIFF(YEAR, i.FacultyJoiningDate, GETDATE())
     FROM FACULTY f
-    INNER JOIN inserted i ON f.FacultyID = i.FacultyID
+    JOIN inserted i 
+    ON f.FacultyID = i.FacultyID
     WHERE i.FacultyJoiningDate IS NOT NULL;
 END;
 
@@ -102,7 +102,8 @@ BEGIN
     UPDATE e
     SET e.EnrollmentDate = GETDATE()
     FROM ENROLLMENT e
-    INNER JOIN inserted i ON e.EnrollmentID = i.EnrollmentID
+    JOIN inserted i 
+    ON e.EnrollmentID = i.EnrollmentID
     WHERE e.EnrollmentDate IS NULL;
 END;
 
