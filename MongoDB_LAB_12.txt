@@ -1,6 +1,8 @@
 LAB 12 Regex Method :-
 
-PART A =======================>
+// =============================================
+// Lab-12 Part A
+// =============================================
 
 // Create Employee collection and insert documents
 db.Employee.insertMany([
@@ -234,8 +236,11 @@ db.Student.find({
 })
 
 
-PART C =================================================>
-// Create Company collection and insert documents
+// =============================================
+// Lab-12 Part C - Company Collection with Regex
+// =============================================
+
+// Create collection named "Company" and insert following 10 documents into it
 db.Company.insertMany([
   { CID: 1, CNAME: "TechNova", EMAIL: "info@technova.com", INDUSTRY: "IT", CITY: "Bangalore", EMPLOYEES: 250 },
   { CID: 2, CNAME: "GreenWorld", EMAIL: "support@greenw.com", INDUSTRY: "Agriculture", CITY: "Ahmedabad", EMPLOYEES: 120 },
@@ -250,13 +255,13 @@ db.Company.insertMany([
 ])
 
 // 1. Find companies whose name starts with 'B' or 'F'
-db.Company.find({ CNAME: { $regex: /^[BF]/i } })
+db.Company.find({ CNAME: { $regex: /^[BF]/ } })
 
 // 2. Find companies located in cities ending with 'pur'
-db.Company.find({ CITY: { $regex: /pur$/i } })
+db.Company.find({ CITY: { $regex: /pur$/ } })
 
 // 3. Find companies whose name contains the word "Core"
-db.Company.find({ CNAME: { $regex: /Core/i } })
+db.Company.find({ CNAME: { $regex: /Core/ } })
 
 // 4. Find companies with email addresses starting with "info"
 db.Company.find({ EMAIL: { $regex: /^info/ } })
@@ -274,16 +279,16 @@ db.Company.find({ CITY: { $regex: /^[A-K]/ } })
 db.Company.find({ INDUSTRY: { $regex: /^.{9,}$/ } })
 
 // 9. Find companies whose EMAIL has a number in it
-db.Company.find({ EMAIL: { $regex: /\d/ } })
+db.Company.find({ EMAIL: { $regex: /[0-9]/ } })
 
 // 10. Find companies whose name starts and ends with vowels
-db.Company.find({ CNAME: { $regex: /^[AEIOU].*[AEIOU]$/i } })
+db.Company.find({ CNAME: { $regex: /^[AEIOU].*[aeiou]$/i } })
 
 // 11. Find companies with CITY names that contain the same letter twice in a row
 db.Company.find({ CITY: { $regex: /(.)\1/ } })
 
 // 12. Find companies whose email starts with any two letters followed by digits
-db.Company.find({ EMAIL: { $regex: /^[A-Za-z]{2}\d/ } })
+db.Company.find({ EMAIL: { $regex: /^[A-Za-z]{2}[0-9]/ } })
 
 // 13. Find companies whose EMAIL includes an underscore
 db.Company.find({ EMAIL: { $regex: /_/ } })
@@ -292,26 +297,13 @@ db.Company.find({ EMAIL: { $regex: /_/ } })
 db.Company.find({ EMAIL: { $regex: /@[gh]/i } })
 
 // 15. Find companies whose CNAME contains a repeating pattern like "ana", "ele", etc.
-db.Company.find({ CNAME: { $regex: /([a-z])([a-z])\1/ } })
+db.Company.find({ CNAME: { $regex: /(.)(.)\1/ } })
 
 // 16. Find companies whose CNAME contains at least 3 vowels
-db.Company.aggregate([
-  {
-    $addFields: {
-      vowelCount: {
-        $size: {
-          $regexFindAll: { input: "$CNAME", regex: /[aeiou]/i }
-        }
-      }
-    }
-  },
-  {
-    $match: { vowelCount: { $gte: 3 } }
-  }
-])
+db.Company.find({ CNAME: { $regex: /[aeiou].*[aeiou].*[aeiou]/i } })
 
 // 17. Find companies whose EMAIL domain ends with '.com' and starts with 'out'
-db.Company.find({ EMAIL: { $regex: /^out.*\.com$/ } })
+db.Company.find({ EMAIL: { $regex: /@out.*\.com$/ } })
 
 // 18. Find companies whose INDUSTRY does not contain any vowels
 db.Company.find({ INDUSTRY: { $regex: /^[^aeiou]*$/i } })
@@ -320,12 +312,9 @@ db.Company.find({ INDUSTRY: { $regex: /^[^aeiou]*$/i } })
 db.Company.find({ CNAME: { $regex: /[^aeiou]{2,}/i } })
 
 // 20. Find companies whose CNAME has alternating vowels and consonants (at least 4 characters)
-db.Company.find({ 
-  $and: [
-    { CNAME: { $regex: /^[aeiou][^aeiou][aeiou][^aeiou]/i } },
-    { CNAME: { $regex: /^.{4,}$/ } }
-  ] 
-})
+db.Company.find({ CNAME: { $regex: /^([aeiou][^aeiou]){2,}/i } })
 
 // 21. Find companies where CITY starts with two same letters
 db.Company.find({ CITY: { $regex: /^(.)\1/ } })
+
+

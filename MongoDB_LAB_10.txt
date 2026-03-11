@@ -2,7 +2,10 @@ Lab-10: Find, limit, skip and sort method
 
 
 
-PART - A ===================>
+// =============================================
+// Lab-10 Part A
+// =============================================
+
 
 use BANK_INFO
 
@@ -66,7 +69,10 @@ db.Deposit.find().skip(5).limit(2)
 // 15. Count documents
 db.Deposit.countDocuments()
 
-PART - B ===================>
+// =============================================
+// Lab-10 Part B
+// =============================================
+
 
 // 1. Insert documents into Student
 db.Student.insertMany([
@@ -113,7 +119,9 @@ db.Student.find(
 )
 
 
-PART - C ===================>
+// =============================================
+// Lab-10 Part C
+// =============================================
 
 // 1. Age between 25 and 35, sorted by age asc
 db.Student.find({ age: { $gte: 25, $lte: 35 } }).sort({ age: 1 })

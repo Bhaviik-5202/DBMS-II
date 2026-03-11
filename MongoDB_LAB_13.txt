@@ -1,0 +1,125 @@
+
+Lab-13 Aggregate Method
+
+// =============================================
+// SETUP - Create Student Collection with Data
+// =============================================
+use Lab13
+
+db.Student.insertMany([
+  { ROLLNO: 101, SNAME: "Vina", DEPARTMENT: "CE", FEES: 15000, SEM: 3, GENDER: "Female", CITY: "Rajkot" },
+  { ROLLNO: 102, SNAME: "Krishna", DEPARTMENT: "EC", FEES: 8000, SEM: 5, GENDER: "Female", CITY: "Ahmedabad" },
+  { ROLLNO: 103, SNAME: "Priti", DEPARTMENT: "Civil", FEES: 12000, SEM: 7, GENDER: "Female", CITY: "Baroda" },
+  { ROLLNO: 104, SNAME: "Mitul", DEPARTMENT: "CE", FEES: 15000, SEM: 3, GENDER: "Male", CITY: "Rajkot" },
+  { ROLLNO: 105, SNAME: "Keshav", DEPARTMENT: "CE", FEES: 15000, SEM: 3, GENDER: "Male", CITY: "Jamnagar" },
+  { ROLLNO: 106, SNAME: "Zarna", DEPARTMENT: "Civil", FEES: 12000, SEM: 5, GENDER: "Female", CITY: "Ahmedabad" },
+  { ROLLNO: 107, SNAME: "Nima", DEPARTMENT: "EE", FEES: 9000, SEM: 5, GENDER: "Female", CITY: "Rajkot" },
+  { ROLLNO: 108, SNAME: "Dhruv", DEPARTMENT: "Mechanical", FEES: 10000, SEM: 5, GENDER: "Male", CITY: "Rajkot" },
+  { ROLLNO: 109, SNAME: "Krish", DEPARTMENT: "Mechanical", FEES: 10000, SEM: 7, GENDER: "Male", CITY: "Baroda" },
+  { ROLLNO: 110, SNAME: "Zeel", DEPARTMENT: "EE", FEES: 9000, SEM: 3, GENDER: "Female", CITY: "Jamnagar" }
+])
+
+// =============================================
+// PART - A (Queries 1-20)
+// =============================================
+
+// 1. Display distinct city
+db.Student.distinct("CITY")
+
+// 2. Display city wise count of number of students
+db.Student.aggregate([{ $group: { _id: "$CITY", count: { $sum: 1 } } }])
+
+// 3. Display sum of fees in your collection
+db.Student.aggregate([{ $group: { _id: null, total_fees: { $sum: "$FEES" } } }])
+
+// 4. Display average of fees in your collection
+db.Student.aggregate([{ $group: { _id: null, avg_fees: { $avg: "$FEES" } } }])
+
+// 5. Display maximum and minimum fees of your collection
+db.Student.aggregate([{ $group: { _id: null, max_fees: { $max: "$FEES" }, min_fees: { $min: "$FEES" } } }])
+
+// 6. Display city wise total fees in your collection
+db.Student.aggregate([{ $group: { _id: "$CITY", total_fees: { $sum: "$FEES" } } }])
+
+// 7. Display gender wise maximum fees in your collection
+db.Student.aggregate([{ $group: { _id: "$GENDER", max_fees: { $max: "$FEES" } } }])
+
+// 8. Display city wise maximum and minimum fees
+db.Student.aggregate([{ $group: { _id: "$CITY", max_fees: { $max: "$FEES" }, min_fees: { $min: "$FEES" } } }])
+
+// 9. Display count of persons lives in Baroda city in your collection
+db.Student.aggregate([{ $match: { CITY: "Baroda" } }, { $count: "baroda_students" }])
+
+// 10. Display average fees of Rajkot city
+db.Student.aggregate([{ $match: { CITY: "Rajkot" } }, { $group: { _id: "$CITY", avg_fees: { $avg: "$FEES" } } }])
+
+// 11. Count the number of male and female students in each Department
+db.Student.aggregate([{ $group: { _id: { department: "$DEPARTMENT", gender: "$GENDER" }, count: { $sum: 1 } } }])
+
+// 12. Find the total Fees collected from each Department
+db.Student.aggregate([{ $group: { _id: "$DEPARTMENT", total_fees: { $sum: "$FEES" } } }])
+
+// 13. Find the minimum Fees paid by male and female students in each City
+db.Student.aggregate([{ $group: { _id: { city: "$CITY", gender: "$GENDER" }, min_fees: { $min: "$FEES" } } }])
+
+// 14. Sort students by Fees in descending order and return the top 5
+db.Student.aggregate([{ $sort: { FEES: -1 } }, { $limit: 5 }])
+
+// 15. Group students by City and calculate the average Fees for each city, only including cities with avg fees more than 12000
+db.Student.aggregate([{ $group: { _id: "$CITY", avg_fees: { $avg: "$FEES" } } }, { $match: { avg_fees: { $gt: 12000 } } }])
+
+// 16. Filter students from CE or Mechanical department, then calculate the total Fees
+db.Student.aggregate([{ $match: { DEPARTMENT: { $in: ["CE", "Mechanical"] } } }, { $group: { _id: null, total_fees: { $sum: "$FEES" } } }])
+
+// 17. Group students by City, Department and Gender and calculate the max, min and average Fees
+db.Student.aggregate([{ $group: { _id: { city: "$CITY", department: "$DEPARTMENT", gender: "$GENDER" }, max_fees: { $max: "$FEES" }, min_fees: { $min: "$FEES" }, avg_fees: { $avg: "$FEES" } } }])
+
+// 18. Filter students from Rajkot, then group by Department and find the average Fees for each department
+db.Student.aggregate([{ $match: { CITY: "Rajkot" } }, { $group: { _id: "$DEPARTMENT", avg_fees: { $avg: "$FEES" } } }])
+
+// 19. Group by Sem and calculate both the total and average Fees, then sort by total fees in descending order
+db.Student.aggregate([{ $group: { _id: "$SEM", total_fees: { $sum: "$FEES" }, avg_fees: { $avg: "$FEES" } } }, { $sort: { total_fees: -1 } }])
+
+// 20. Find the top 3 cities with the highest total Fees collected by summing up all students' fees in those cities
+db.Student.aggregate([{ $group: { _id: "$CITY", total_fees: { $sum: "$FEES" } } }, { $sort: { total_fees: -1 } }, { $limit: 3 }])
+
+// =============================================
+// PART - B (Stock Collection)
+// =============================================
+
+// 1. Create a collection named "Stock"
+db.Stock.insertMany([
+  { "_id": 1, "company": "Company-A", "sector": "Technology", "eps": 5.2, "pe": 15.3, "roe": 12.8, "sales": 300000, "profit": 25000 },
+  { "_id": 2, "company": "Company-B", "sector": "Finance", "eps": 7.1, "pe": 12.4, "roe": 10.9, "sales": 500000, "profit": 55000 },
+  { "_id": 3, "company": "Company-C", "sector": "Retail", "eps": 3.8, "pe": 22.1, "roe": 9.5, "sales": 200000, "profit": 15000 },
+  { "_id": 4, "company": "Company-D", "sector": "Technology", "eps": 5.2, "pe": 15.3, "roe": 12.8, "sales": 300000, "profit": 25000 },
+  { "_id": 5, "company": "Company-E", "sector": "Finance", "eps": 7.1, "pe": 12.4, "roe": 10.9, "sales": 450000, "profit": 40000 },
+  { "_id": 6, "company": "Company-F", "sector": "Healthcare", "eps": 3.8, "pe": 18.9, "roe": 9.5, "sales": 500000, "profit": 35000 }
+])
+
+// 2. Calculate the average PE ratio of companies grouped by sector
+db.Stock.aggregate([{ $group: { _id: "$sector", avg_pe: { $avg: "$pe" } } }])
+
+// 3. Get the sum of sales and profit for each company
+db.Stock.aggregate([{ $project: { company: 1, total_sales_profit: { $add: ["$sales", "$profit"] } } }])
+
+// 4. Find companies with sales less than 400,000 and sort them by sales in descending order
+db.Stock.aggregate([{ $match: { sales: { $lt: 400000 } } }, { $sort: { sales: -1 } }])
+
+// 5. Group companies by sector and find the total number of companies in each sector
+db.Stock.aggregate([{ $group: { _id: "$sector", company_count: { $sum: 1 } } }])
+
+// 6. Get the average ROE for companies with sales greater than 200,000
+db.Stock.aggregate([{ $match: { sales: { $gt: 200000 } } }, { $group: { _id: null, avg_roe: { $avg: "$roe" } } }])
+
+// 7. Find the maximum profit in each sector
+db.Stock.aggregate([{ $group: { _id: "$sector", max_profit: { $max: "$profit" } } }])
+
+// 8. Get the total sales and count of companies in each sector
+db.Stock.aggregate([{ $group: { _id: "$sector", total_sales: { $sum: "$sales" }, company_count: { $sum: 1 } } }])
+
+// 9. Project fields where profit is more than 20,000 and only show company and profit
+db.Stock.aggregate([{ $match: { profit: { $gt: 20000 } } }, { $project: { company: 1, profit: 1, _id: 0 } }])
+
+// 10. Find companies with the lowest ROE and sort them in ascending order
+db.Stock.aggregate([{ $sort: { roe: 1 } }])

@@ -1,7 +1,9 @@
 Lab-11: update, delete and rename method
 
 
-PART - A ===================>
+// =============================================
+// Lab-11 Part A
+// =============================================
 
 // 1. Update John's age to 31
 db.Student.updateOne({ name: "John" }, { $set: { age: 31 } })
@@ -106,7 +108,9 @@ db.Employee.find().count()
 
 
 
-PART - B ===================>
+// =============================================
+// Lab-11 Part B
+// =============================================
 
 // 1. Female students in Rajkot
 db.Student.find({ Gender: "Female", City: "Rajkot" })
@@ -217,7 +221,9 @@ db.Student.updateMany(
 
 
 
-PART - C ===================>
+// =============================================
+// Lab-11 Part C
+// =============================================
 
 
 // 1. Create capped collection logs (max 100KB, 10 docs)

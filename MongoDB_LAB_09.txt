@@ -2,7 +2,10 @@ Lab-9: createCollection, dropCollection and insert method
 
 
 
-PART - A ===================>
+// =============================================
+// Lab-9 Part A
+// =============================================
+
 
 // 1. Create a new database named "Darshan"
 use Darshan
@@ -89,7 +92,10 @@ db.Deposit.find()
 db.Deposit.drop()
 
 
-PART - B ===================>
+// =============================================
+// Lab-9 Part B
+// =============================================
+
 // 1. Create database Computer
 use Computer
 
@@ -120,4 +126,33 @@ db.Faculty.drop()
 db.dropDatabase()
 
 
-PART - C ===================>
+// =============================================
+// Lab-9 Part C - UI Operations (Commands)
+// =============================================
+
+// 1. Create a new database named "Computer"
+use Computer
+
+// 2. Create a collection named "Faculty" in the "Computer" database
+db.createCollection("Faculty")
+
+// 3. Insert below documents into "Faculty" collection
+db.Faculty.insertMany([
+  { FID: 1, FNAME: "ANIL", BNAME: "CE", SALARY: 10000, JDATE: "1-3-95" },
+  { FID: 2, FNAME: "SUNIL", BNAME: "CE", SALARY: 50000, JDATE: "4-1-96" },
+  { FID: 3, FNAME: "MEHUL", BNAME: "IT", SALARY: 35000, JDATE: "17-11-95" },
+  { FID: 4, FNAME: "MADHURI", BNAME: "IT", SALARY: 12000, JDATE: "17-12-95" },
+  { FID: 5, FNAME: "PRMOD", BNAME: "CE", SALARY: 30000, JDATE: "27-3-96" },
+  { FID: 6, FNAME: "SANDIP", BNAME: "CE", SALARY: 20000, JDATE: "31-3-96" },
+  { FID: 7, FNAME: "SHIVANI", BNAME: "CE", SALARY: 10000, JDATE: "5-9-95" },
+  { FID: 8, FNAME: "KRANTI", BNAME: "IT", SALARY: 50000, JDATE: "2-7-95" }
+])
+
+// 4. Display all the documents of "Faculty" collection
+db.Faculty.find()
+
+// 5. Drop the "Faculty" collection
+db.Faculty.drop()
+
+// 6. Drop the "Computer" database
+db.dropDatabase()

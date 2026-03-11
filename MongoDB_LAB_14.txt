@@ -1,0 +1,112 @@
+// =============================================
+// SETUP - Create Collections and Insert Data
+// =============================================
+use Lab14
+
+db.Student.insertMany([
+  { "_id": 1, "name": "Amit", "dept_id": 101, "marks": 82 },
+  { "_id": 2, "name": "Rina", "dept_id": 102, "marks": 91 },
+  { "_id": 3, "name": "Karan", "dept_id": 101, "marks": 76 },
+  { "_id": 4, "name": "Meera", "dept_id": 103, "marks": 88 },
+  { "_id": 5, "name": "Iqbal", "dept_id": 102, "marks": 67 }
+])
+
+db.Department.insertMany([
+  { "_id": 101, "dept_name": "Computer Science" },
+  { "_id": 102, "dept_name": "Electronics" },
+  { "_id": 103, "dept_name": "Mechanical" }
+])
+
+db.Fees.insertMany([
+  { "_id": 1, "student_id": 1, "amount": 25000, "status": "Paid" },
+  { "_id": 2, "student_id": 2, "amount": 30000, "status": "Unpaid" },
+  { "_id": 3, "student_id": 3, "amount": 25000, "status": "Paid" },
+  { "_id": 4, "student_id": 4, "amount": 35000, "status": "Paid" }
+])
+
+// =============================================
+// PART - A
+// =============================================
+
+// 1. Fetches each student and attaches matching department details using $lookup
+db.Student.aggregate([{ $lookup: { from: "Department", localField: "dept_id", foreignField: "_id", as: "department_details" } }])
+
+// 2. Joins students with departments and displays only the student's name and their department name
+db.Student.aggregate([{ $lookup: { from: "Department", localField: "dept_id", foreignField: "_id", as: "dept_info" } }, { $project: { name: 1, "dept_info.dept_name": 1, _id: 0 } }])
+
+// 3. Retrieves every student along with their corresponding fee information
+db.Student.aggregate([{ $lookup: { from: "Fees", localField: "_id", foreignField: "student_id", as: "fee_details" } }])
+
+// 4. Finds students whose fee status is marked as "Unpaid"
+db.Student.aggregate([{ $lookup: { from: "Fees", localField: "_id", foreignField: "student_id", as: "fee_info" } }, { $match: { "fee_info.status": "Unpaid" } }])
+
+// 5. Fetches students with both their department details and fee records in a single pipeline
+db.Student.aggregate([{ $lookup: { from: "Department", localField: "dept_id", foreignField: "_id", as: "department" } }, { $lookup: { from: "Fees", localField: "_id", foreignField: "student_id", as: "fees" } }])
+
+// 6. Returns only those students for whom no matching department exists
+db.Student.aggregate([{ $lookup: { from: "Department", localField: "dept_id", foreignField: "_id", as: "dept_match" } }, { $match: { "dept_match": { $size: 0 } } }])
+
+// 7. Selects students whose department name is "Computer Science" using join + match
+db.Student.aggregate([{ $lookup: { from: "Department", localField: "dept_id", foreignField: "_id", as: "dept" } }, { $match: { "dept.dept_name": "Computer Science" } }])
+
+// 8. Performs a join with departments and sorts all students by their marks in descending order
+db.Student.aggregate([{ $lookup: { from: "Department", localField: "dept_id", foreignField: "_id", as: "dept" } }, { $sort: { marks: -1 } }])
+
+// 9. Counts how many students belong to each department after joining
+db.Student.aggregate([{ $lookup: { from: "Department", localField: "dept_id", foreignField: "_id", as: "dept" } }, { $group: { _id: { $arrayElemAt: ["$dept.dept_name", 0] }, student_count: { $sum: 1 } } }])
+
+// 10. Joins with departments and filters students whose marks are greater than 80
+db.Student.aggregate([{ $lookup: { from: "Department", localField: "dept_id", foreignField: "_id", as: "dept" } }, { $match: { marks: { $gt: 80 } } }])
+
+// 11. Finds the maximum marks obtained within each department using join + group
+db.Student.aggregate([{ $lookup: { from: "Department", localField: "dept_id", foreignField: "_id", as: "dept" } }, { $group: { _id: { $arrayElemAt: ["$dept.dept_name", 0] }, max_marks: { $max: "$marks" } } }])
+
+// 12. Returns students whose fee status is "Paid" using a join on the fees collection
+db.Student.aggregate([{ $lookup: { from: "Fees", localField: "_id", foreignField: "student_id", as: "fee" } }, { $match: { "fee.status": "Paid" } }])
+
+// 13. Joins students with fee records and calculates total fee amount per student
+db.Student.aggregate([{ $lookup: { from: "Fees", localField: "_id", foreignField: "student_id", as: "fee" } }, { $project: { name: 1, total_fee: { $sum: "$fee.amount" }, _id: 0 } }])
+
+// 14. Fetches each department along with all students enrolled in that department
+db.Department.aggregate([{ $lookup: { from: "Student", localField: "_id", foreignField: "dept_id", as: "students" } }])
+
+// 15. Returns only those departments which do not have any students mapped to them
+db.Department.aggregate([{ $lookup: { from: "Student", localField: "_id", foreignField: "dept_id", as: "students" } }, { $match: { "students": { $size: 0 } } }])
+
+// =============================================
+// PART - B
+// =============================================
+
+// 1. Returns the maximum marks scored by any student
+db.Student.aggregate([{ $group: { _id: null, max_marks: { $max: "$marks" } } }])
+
+// 2. Calculates the average marks of students separately for each department
+db.Student.aggregate([{ $group: { _id: "$dept_id", avg_marks: { $avg: "$marks" } } }, { $lookup: { from: "Department", localField: "_id", foreignField: "_id", as: "dept" } }, { $project: { department: { $arrayElemAt: ["$dept.dept_name", 0] }, avg_marks: 1, _id: 0 } }])
+
+// 3. Computes the sum of all fee amounts paid by students
+db.Fees.aggregate([{ $group: { _id: null, total_fees: { $sum: "$amount" } } }])
+
+// 4. Counts how many students have scored marks ≥ 80
+db.Student.aggregate([{ $match: { marks: { $gte: 80 } } }, { $count: "students_above_80" }])
+
+// 5. Finds the lowest marks within each department
+db.Student.aggregate([{ $group: { _id: "$dept_id", min_marks: { $min: "$marks" } } }, { $lookup: { from: "Department", localField: "_id", foreignField: "_id", as: "dept" } }, { $project: { department: { $arrayElemAt: ["$dept.dept_name", 0] }, min_marks: 1, _id: 0 } }])
+
+// =============================================
+// PART - C
+// =============================================
+
+// 1. Arranges all student records in descending order of marks
+db.Student.aggregate([{ $sort: { marks: -1 } }])
+
+// 2. Divides students into buckets based on marks: 0-60, 60-80, and 80-100
+db.Student.aggregate([{ $bucket: { groupBy: "$marks", boundaries: [0, 60, 80, 100], default: "Other", output: { count: { $sum: 1 }, students: { $push: "$name" } } } }])
+
+// 3. Calculates the total (sum) of marks obtained by students in each department
+db.Student.aggregate([{ $group: { _id: "$dept_id", total_marks: { $sum: "$marks" } } }, { $lookup: { from: "Department", localField: "_id", foreignField: "_id", as: "dept" } }, { $project: { department: { $arrayElemAt: ["$dept.dept_name", 0] }, total_marks: 1, _id: 0 } }])
+
+// 4. Finds the average amount of fee recorded in the fees collection
+db.Fees.aggregate([{ $group: { _id: null, avg_fee_amount: { $avg: "$amount" } } }])
+
+// 5. Compares each student's marks with the average marks of their department
+db.Student.aggregate([{ $lookup: { from: "Department", localField: "dept_id", foreignField: "_id", as: "dept" } }, { $group: { _id: "$dept_id", dept_name: { $first: { $arrayElemAt: ["$dept.dept_name", 0] } }, avg_dept_marks: { $avg: "$marks" }, students: { $push: { name: "$name", marks: "$marks" } } } }, { $unwind: "$students" }, { $project: { _id: 0, student_name: "$students.name", student_marks: "$students.marks", department: "$dept_name", department_avg: "$avg_dept_marks", comparison: { $cond: { if: { $gt: ["$students.marks", "$avg_dept_marks"] }, then: "Above Average", else: "Below or Equal to Average" } } } }])
